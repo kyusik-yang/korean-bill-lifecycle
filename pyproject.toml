@@ -31,6 +31,20 @@ Issues = "https://github.com/kyusik-yang/kna/issues"
 [project.scripts]
 kna = "kna.cli:cli"
 
+[tool.hatch.build.targets.sdist]
+# The data lives in the Git repository (via Git LFS), not in the Python
+# package. Without this the sdist bundles ~200MB of parquet and sqlite.
+include = [
+  "kna/",
+  "README.md",
+  "CODEBOOK.md",
+  "CORRECTIONS.md",
+  "DATA_AVAILABILITY.md",
+  "pyproject.toml",
+  "*.py",
+  "*.R",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["kna"]
 
