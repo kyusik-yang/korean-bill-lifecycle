@@ -118,17 +118,48 @@ class BillDB:
             self._cache[key] = df
         return self._cache[key]
 
-    def ideal_points(self) -> pd.DataFrame:
-        """Load DW-NOMINATE ideal points (936 legislator-terms, 20-22nd)."""
-        if "ip" not in self._cache:
-            p = self.data_dir / "dw_ideal_points_20_22.csv"
+    def ideal_points(self, series: str = "bridged") -> pd.DataFrame:
+        """Load legislator ideal points (936 legislator-terms, 20-22nd).
+
+        Three series are available and they are not interchangeable. See the
+        "Ideal Points" section of CODEBOOK.md before choosing.
+
+        Args:
+            series: which estimates to load.
+                ``"bridged"`` (default) chained bridging alignment. Comparable
+                    both within and across assemblies. Column ``ideal_point``.
+                ``"wnominate"`` per-assembly W-NOMINATE. Comparable WITHIN an
+                    assembly only; each term is separately renormalized, so
+                    differences across terms mix real movement with rescaling.
+                ``"dwnominate"`` pooled DW-NOMINATE. Comparable across
+                    assemblies, but with only three terms the estimator admits
+                    just a constant, so each legislator has one position for
+                    all terms and within-legislator movement is zero.
+
+        Returns:
+            DataFrame with member_id, member_name, party, term, ideal_point.
+            Sign convention: positive = conservative, negative = liberal.
+        """
+        files = {
+            "bridged": ("ideal_points_bridged.csv", "bridged_1d"),
+            "wnominate": ("ideal_points_wnominate.csv", "wnom_1d"),
+            "dwnominate": ("ideal_points_dwnominate.csv", "dwnom_1d"),
+        }
+        if series not in files:
+            raise ValueError(
+                f"unknown series {series!r}; choose from {sorted(files)}"
+            )
+
+        key = f"ip_{series}"
+        if key not in self._cache:
+            fname, col = files[series]
+            p = self.data_dir / fname
             if not p.exists():
-                raise FileNotFoundError("dw_ideal_points_20_22.csv not found")
+                raise FileNotFoundError(f"{fname} not found")
             df = pd.read_csv(p)
-            # Flip sign: negative = liberal, positive = conservative
-            df["aligned"] = -df["aligned"]
-            self._cache["ip"] = df
-        return self._cache["ip"]
+            df = df.rename(columns={col: "ideal_point"})
+            self._cache[key] = df
+        return self._cache[key]
 
     def committee_meetings(
         self,

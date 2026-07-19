@@ -2,6 +2,13 @@
 
 [![PyPI](https://img.shields.io/pypi/v/kna)](https://pypi.org/project/kna/)
 
+
+> **Correction, 2026-07-18.** Ideal point estimates released before this date were labeled
+> DW-NOMINATE but were per-assembly W-NOMINATE with a post hoc sign alignment. The labeling is
+> fixed, three clearly named series are now distributed, and the build script is public. If you
+> compared scores *across* assemblies, please re-check your results against
+> [CORRECTIONS.md](CORRECTIONS.md).
+
 Comprehensive CLI and master database for the Korean National Assembly.
 Integrates 8 Open Assembly API endpoints into a single queryable interface
 covering six assembly terms (17th-22nd, 2004-2026).
@@ -96,7 +103,7 @@ kna info
 |---|---|
 | **Total Bills** | 110,778 (17-22nd, full lifecycle) |
 | **Roll Call Votes** | 2,425,113 member-level records |
-| **DW-NOMINATE** | 936 legislator-terms (20-22nd, cross-assembly aligned) |
+| **Ideal points** | 936 legislator-terms (20-22nd, three series: per-assembly, bridged, pooled DW-NOMINATE) |
 | **Committee Meetings** | 572,127 records |
 | **Members** | 1,933 member-terms (17-22nd, party/district/committee) |
 | **Asset Disclosures** | 2,928 member-year rows (19-22nd, wealth panel) |
@@ -118,7 +125,7 @@ kna text "기후변화" --assembly 22
 # Bill lifecycle timeline (proposal → promulgation)
 kna show 2217673
 
-# Legislator profile with DW-NOMINATE ideal point
+# Legislator profile with ideal point
 kna legislator 이재명 --assembly 22
 
 # Legislative funnel

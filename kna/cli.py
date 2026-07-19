@@ -25,7 +25,7 @@ def cli():
 
     Comprehensive query tool for 110K+ bills across the 17th-22nd
     Korean National Assembly: full lifecycle timestamps, 2.4M roll call
-    votes, DW-NOMINATE ideal points, and bill propose-reason texts.
+    votes, cross-assembly ideal points, and bill propose-reason texts.
     """
 
 
