@@ -87,10 +87,31 @@ means from the 20th to the 22nd Assembly:
 | Chained bridging | 0.753 | 0.806 | 0.801 | +6.3% |
 | Pooled DW-NOMINATE | 0.710 | 0.772 | 0.794 | +12.0% |
 
-Per-assembly estimates are renormalized within each term and overstate
-cross-term growth by roughly a factor of five here. Within-assembly rankings
-and comparisons were never affected: all three series correlate above 0.96
-within any single term.
+Per-assembly estimates fix their scale from the recovered configuration rather
+than from any external unit, so what they identify is the ratio of between-party
+distance to within-party dispersion rather than the distance itself. Over this
+period Korean parties became more internally cohesive: party unity on contested
+votes rose from 0.911 to 0.943, a measure that uses no scaling model at all.
+Rising cohesion raises that ratio, and per-assembly estimation reports it as
+parties moving apart.
+
+Two practical consequences follow for anyone using these files.
+
+**Report dispersion alongside distance.** A polarization trend that moves while
+within-party dispersion is flat means something different from one that moves
+while dispersion collapses. Both are computable from any of the three series.
+
+**Bridging does not fix this.** The alignment in `ideal_points_bridged.csv` is
+an affine map, and an affine map rescales distance and dispersion together, so
+it leaves their ratio exactly where it found it. In these data the
+distance-to-dispersion ratio is identical under `wnom_1d` and `bridged_1d` in
+every assembly (4.05, 5.31, 15.49). Bridging solves comparability, which is a
+real and separate problem. Only the pooled estimation in
+`ideal_points_dwnominate.csv` anchors the metric outside a single chamber, and
+its ratios differ accordingly (5.33, 6.26, 8.04).
+
+Within-assembly rankings and comparisons were never affected: all three series
+correlate above 0.96 within any single term.
 
 ### Action for users
 
