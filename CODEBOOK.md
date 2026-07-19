@@ -469,7 +469,7 @@ Phase 2 수집 완료. 다음 필드는 Variable Index #43-54에 포함되어 �
 
 | 파일 | 컬럼 | 방법 | 대수 내 비교 | 대수 간 비교 | 의원 이동 |
 |------|------|------|:---:|:---:|:---:|
-| `ideal_points_wnominate.csv` | `wnom_1d`, `wnom_2d` | 대수별 W-NOMINATE | ✅ | ❌ | ❌ |
+| `ideal_points_wnominate.csv` | `wnom_1d` | 대수별 W-NOMINATE (1차원 적합) | ✅ | ❌ | ❌ |
 | `ideal_points_bridged.csv` | `bridged_1d` | 연쇄 bridging 정렬 | ✅ | ✅ | ⚠️ 부분적 |
 | `ideal_points_dwnominate.csv` | `dwnom_1d` | 통합 DW-NOMINATE | ✅ | ✅ | ❌ (상수) |
 
@@ -478,7 +478,11 @@ Phase 2 수집 완료. 다음 필드는 Variable Index #43-54에 포함되어 �
 
 ### 1. `ideal_points_wnominate.csv` - 대수별 W-NOMINATE
 
-각 대수를 독립적으로 스케일링한다. 표본은 소수파 비율 2.5% 이상인 표결(contested)과
+각 대수를 독립적으로 스케일링한다. **`wnom_1d`는 1차원 적합의 좌표다.**
+2차원 적합도 함께 수행하며 그 좌표는 `wnom2d_dim1`, `wnom2d_dim2`로 제공된다
+(차원수 진단의 고유값도 2차원 적합에서 나온다). 이 파일이 쓰이는 모든 양,
+즉 정당 간 거리·당내 분산·그 비율이 단일 차원에서 정의되므로 1차원 적합을
+기본으로 삼는다. 2차원 해의 첫 좌표를 쓰면 회전 문제가 따라온다. 표본은 소수파 비율 2.5% 이상인 표결(contested)과
 그런 표결에 20회 이상 참여한 의원으로 제한된다.
 
 **⚠️ 대수 간 비교 금지.** 스케일링 모형은 의원 배치를 **반사(reflection)와 정규화까지만**

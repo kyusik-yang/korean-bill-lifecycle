@@ -4,6 +4,46 @@ Errata for data released by this repository. Newest first.
 
 ---
 
+## 2026-07-19 - `wnom_1d` now comes from a one-dimensional fit
+
+**Severity: low.** Affects `ideal_points_wnominate.csv` and
+`ideal_points_bridged.csv` as released in 0.5.0. Values change slightly;
+conclusions do not.
+
+### What changed
+
+In 0.5.0, `wnom_1d` held the first coordinate of a **two-dimensional**
+W-NOMINATE fit. It now holds the coordinate from a **one-dimensional** fit. The
+two-dimensional fit is still run and its coordinates are still distributed, as
+`wnom2d_dim1` and `wnom2d_dim2`, and its eigenvalues still drive the
+dimensionality diagnostics.
+
+Both are defensible specifications. The one-dimensional fit is the better
+default here because every quantity these files are used for, the distance
+between party means, within-party dispersion, and their ratio, is defined on a
+single dimension, and taking one coordinate from a two-dimensional solution
+raises a rotation question that a one-dimensional fit does not.
+
+### Size of the change
+
+| Assembly | Correlation, old vs new | Mean abs. difference | Party distance, old to new |
+|----------|------------------------|----------------------|----------------------------|
+| 20th | 0.9993 | 0.028 | 0.753 to 0.761 |
+| 21st | 0.9993 | 0.011 | 0.903 to 0.908 |
+| 22nd | 0.9997 | 0.006 | 1.243 to 1.236 |
+
+Growth in the inter-party distance from the 20th to the 22nd Assembly moves from
++65.0 to +62.4 percent. Nothing in the interpretation changes.
+
+### Breaking change
+
+The column `wnom_2d` is gone. Code that read it should read `wnom2d_dim2`. Code
+that read `wnom_1d` continues to work but receives slightly different values.
+`ideal_points_dwnominate.csv` is unaffected: the pooled estimation was already
+one-dimensional.
+
+---
+
 ## 2026-07-18 — Ideal point estimates were mislabeled as DW-NOMINATE
 
 **Severity: high.** Affects every release up to and including `kna` 0.4.x, the
@@ -61,7 +101,7 @@ three files with explicit names, all produced by `build_ideal_points.R`:
 
 | File | Column | Method |
 |------|--------|--------|
-| `ideal_points_wnominate.csv` | `wnom_1d`, `wnom_2d` | per-assembly W-NOMINATE |
+| `ideal_points_wnominate.csv` | `wnom_1d` | per-assembly W-NOMINATE |
 | `ideal_points_bridged.csv` | `bridged_1d` | chained bridging alignment |
 | `ideal_points_dwnominate.csv` | `dwnom_1d` | pooled DW-NOMINATE |
 

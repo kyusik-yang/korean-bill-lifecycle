@@ -123,15 +123,27 @@ for (t in c(20, 21, 22)) {
   anchor <- which(rownames(rcobj$votes) %in% cons_ids)[1]
   if (is.na(anchor)) stop(sprintf("no conservative anchor in the %dth Assembly", t))
 
-  fit <- wnominate(rcobj, dims = 2, polarity = c(anchor, anchor), verbose = FALSE)
+  # Two fits. The one-dimensional fit is the series the analysis uses, because
+  # the quantities of interest are defined on a single dimension. The
+  # two-dimensional fit is retained because its second dimension is what users
+  # comparing configurations will want, and because its eigenvalues feed the
+  # dimensionality diagnostics.
+  fit  <- wnominate(rcobj, dims = 1, polarity = anchor, verbose = FALSE)
+  fit2 <- wnominate(rcobj, dims = 2, polarity = c(anchor, anchor), verbose = FALSE)
 
   sc <- data.frame(
     member_id = rownames(fit$legislators),
     term = t,
     wnom_1d = fit$legislators$coord1D,
-    wnom_2d = fit$legislators$coord2D,
     stringsAsFactors = FALSE
   )
+  sc2 <- data.frame(
+    member_id = rownames(fit2$legislators),
+    wnom2d_dim1 = fit2$legislators$coord1D,
+    wnom2d_dim2 = fit2$legislators$coord2D,
+    stringsAsFactors = FALSE
+  )
+  sc <- dplyr::left_join(sc, sc2, by = "member_id")
 
   # Orient to the Voteview convention: positive = conservative, negative =
   # liberal. Without this the sign is whatever the anchor happened to produce.
@@ -140,20 +152,25 @@ for (t in c(20, 21, 22)) {
   if (mean(sc$wnom_1d[sc$party %in% CONSERVATIVE], na.rm = TRUE) <
       mean(sc$wnom_1d[sc$party == LIBERAL], na.rm = TRUE)) {
     sc$wnom_1d <- -sc$wnom_1d
-    sc$wnom_2d <- -sc$wnom_2d
     cat(sprintf("    (%dth: flipped to positive = conservative)\n", t))
+  }
+  if (mean(sc$wnom2d_dim1[sc$party %in% CONSERVATIVE], na.rm = TRUE) <
+      mean(sc$wnom2d_dim1[sc$party == LIBERAL], na.rm = TRUE)) {
+    sc$wnom2d_dim1 <- -sc$wnom2d_dim1
+    sc$wnom2d_dim2 <- -sc$wnom2d_dim2
   }
   wnom_scores[[as.character(t)]] <- sc %>% dplyr::select(-party)
 
   cat(sprintf("    APRE 1D = %.3f, 2D = %.3f | eigenvalues > 1: %d\n",
-              fit$fits["apre1D"], fit$fits["apre2D"],
-              sum(fit$eigenvalues > 1, na.rm = TRUE)))
+              fit$fits["apre1D"], fit2$fits["apre2D"],
+              sum(fit2$eigenvalues > 1, na.rm = TRUE)))
 }
 
 wnom <- bind_rows(wnom_scores) %>%
   left_join(member_meta, by = c("member_id", "term")) %>%
   mutate(party_bloc = party_bloc(party)) %>%
-  dplyr::select(member_id, member_name, party, party_bloc, term, wnom_1d, wnom_2d)
+  dplyr::select(member_id, member_name, party, party_bloc, term,
+                wnom_1d, wnom2d_dim1, wnom2d_dim2)
 
 write.csv(wnom, file.path(PROCESSED, "ideal_points_wnominate.csv"), row.names = FALSE)
 cat(sprintf("  wrote ideal_points_wnominate.csv (%d rows)\n", nrow(wnom)))
