@@ -4,10 +4,11 @@ build_voteview.py
 Generate a Korean Voteview-style interactive website (docs/voteview.html).
 
 Inspired by voteview.com but for the Korean National Assembly.
-Uses DW-NOMINATE ideal point estimates for the 20th-22nd Assemblies.
+Uses bridging-aligned W-NOMINATE ideal points for the 20th-22nd Assemblies.
+See CODEBOOK.md, section 'Ideal Points', for how the series is built.
 
 Data:
-  - data/processed/dw_ideal_points_20_22.csv  (936 legislator-terms)
+  - data/processed/ideal_points_bridged.csv  (936 legislator-terms)
   - data/processed/roll_calls_all.parquet     (2.4M individual votes)
 
 Output:
@@ -26,11 +27,11 @@ OUT_DIR = ROOT / "docs"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # ── Load data ─────────────────────────────────────────────────────────
-df = pd.read_csv(DATA_DIR / "dw_ideal_points_20_22.csv")
+df = pd.read_csv(DATA_DIR / "ideal_points_bridged.csv")
 
-# Flip sign so that negative = liberal (진보), positive = conservative (보수)
-# Matches conventional left-right political spectrum
-df["aligned"] = -df["aligned"]
+# ideal_points_bridged.csv is already oriented to the Voteview convention:
+# positive = conservative (보수), negative = liberal (진보). No flip needed.
+df["aligned"] = df["bridged_1d"]
 
 # ── Party color mapping ───────────────────────────────────────────────
 # Conservative bloc -> red tones, liberal -> blue tones
@@ -196,7 +197,7 @@ for party in all_parties:
             f"<b>{row['member_name']}</b><br>"
             f"정당: {row['party']}<br>"
             f"대수: {int(row['term'])}대 국회<br>"
-            f"DW-NOMINATE: {row['aligned']:.3f}<br>"
+            f"이념점수: {row['aligned']:.3f}<br>"
             f"순위: {int(row['rank'])}/{int(row['total_in_term'])}"
         )
     trace = {
@@ -227,7 +228,7 @@ scatter_layout = {
     "title": None,
     "font": PLOT_FONT,
     "xaxis": {
-        "title": {"text": "DW-NOMINATE (1st Dimension, Aligned)", "font": {"size": 13, "color": "#aab"}},
+        "title": {"text": "이념점수 (1차원, bridging 정렬)", "font": {"size": 13, "color": "#aab"}},
         "range": [-1.15, 1.15],
         "zeroline": True,
         "zerolinecolor": "rgba(255,255,255,0.15)",
@@ -313,7 +314,7 @@ violin_layout = {
         "gridcolor": "rgba(255,255,255,0.05)",
     },
     "yaxis": {
-        "title": {"text": "DW-NOMINATE (Aligned)", "font": {"size": 13, "color": "#aab"}},
+        "title": {"text": "이념점수 (bridging 정렬)", "font": {"size": 13, "color": "#aab"}},
         "range": [-1.15, 1.15],
         "zeroline": True,
         "zerolinecolor": "rgba(255,255,255,0.15)",
@@ -390,7 +391,7 @@ polar_layout = {
         "gridcolor": "rgba(255,255,255,0.05)",
     },
     "yaxis": {
-        "title": {"text": "평균 DW-NOMINATE (Aligned)", "font": {"size": 13, "color": "#aab"}},
+        "title": {"text": "평균 이념점수 (bridging 정렬)", "font": {"size": 13, "color": "#aab"}},
         "range": [-0.65, 0.75],
         "zeroline": True,
         "zerolinecolor": "rgba(255,255,255,0.15)",
@@ -445,10 +446,10 @@ html_template = """<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Korean National Assembly Voteview - 대한민국 국회 이념지도</title>
-<meta name="description" content="DW-NOMINATE ideal point estimates for 936 legislators across the 20th-22nd Korean National Assemblies (2016-2026), with polarization trends and party distributions.">
+<meta name="description" content="Bridging-aligned ideal point estimates for 936 legislators across the 20th-22nd Korean National Assemblies (2016-2026), with polarization trends and party distributions.">
 <meta name="author" content="Kyusik Yang">
 <meta property="og:title" content="Korean National Assembly Voteview">
-<meta property="og:description" content="Interactive DW-NOMINATE ideology map for Korean legislators, 20th-22nd Assemblies.">
+<meta property="og:description" content="Interactive ideology map for Korean legislators, 20th-22nd Assemblies.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://kyusik-yang.github.io/kna/voteview.html">
 <meta name="twitter:card" content="summary">
@@ -797,6 +798,8 @@ html_template = """<!DOCTYPE html>
     color: var(--text-secondary);
     line-height: 1.7;
   }
+.method-warning{border-left:3px solid #d9822b;background:rgba(217,130,43,.08);padding:12px 16px;margin:18px 0;border-radius:4px}
+.method-warning h3{color:#d9822b;margin-top:0}
 
   .method-note h3 {
     color: var(--text-primary);
@@ -866,7 +869,7 @@ html_template = """<!DOCTYPE html>
     </div>
     <div class="subtitle-ko">대한민국 국회 이념지도</div>
     <div class="header-desc">
-      DW-NOMINATE Ideal Point Estimates, 20th - 22nd Assembly (2016 - 2026)
+      이념점수 추정치, 20대 - 22대 국회 (2016 - 2026)
     </div>
     <div class="stats-row">
       <div class="stat-item">
@@ -969,30 +972,35 @@ html_template = """<!DOCTYPE html>
       <h2>Methodology</h2>
     </div>
     <div class="method-note">
-      <h3>DW-NOMINATE Estimation</h3>
+      <h3>추정 방법</h3>
       <p>
-        Ideal points are estimated using the <strong>DW-NOMINATE</strong> (Dynamic Weighted NOMINAl
-        Three-step Estimation) scaling procedure, the same method used for the U.S. Congress at
-        <a href="https://voteview.com" target="_blank" rel="noopener">voteview.com</a>. The model
-        recovers latent ideological positions from observed roll call voting patterns.
+        이념점수는 본회의 기명표결에 <strong>W-NOMINATE</strong> 스케일링을 적용해 추정한다.
+        각 대수를 독립적으로 추정한 뒤, 두 대수 모두에 재직한 <strong>bridging 의원</strong>을
+        이용해 이후 대수를 이전 대수의 단위로 사상(affine map)한다. 20대를 기준으로 21대를
+        정렬하고(bridging 126명), 정렬된 21대를 기준으로 22대를 정렬한다(150명).
       </p>
       <p>
-        The first dimension typically captures the primary left-right (progressive-conservative)
-        cleavage. Scores range from -1 to +1. In the Korean context, negative values correspond
-        to the conservative bloc (국민의힘 and predecessor parties) while positive values
-        correspond to the liberal-progressive bloc (더불어민주당 and allied parties). This polarity
-        is arbitrary and reflects the alignment procedure described below.
+        소수파 비율 2.5% 미만인 표결(사실상 만장일치)과 그런 표결에 20회 미만 참여한 의원은
+        제외한다. 부호는 <strong>양수 = 보수, 음수 = 진보</strong>로 통일했다.
+        척도는 대략 -1에서 +1 사이다.
       </p>
 
-      <h3>Bridging Alignment</h3>
-      <p>
-        Because each assembly is estimated independently, raw NOMINATE scores are not directly
-        comparable across terms. To address this, scores are <strong>aligned</strong> using
-        legislators who served in multiple consecutive assemblies as bridging anchors. The
-        <code>aligned</code> score shown in all visualizations reflects this cross-assembly
-        normalization, making it meaningful to compare ideological positions across the 20th,
-        21st, and 22nd assemblies.
-      </p>
+      <div class="method-warning">
+        <h3>&#9888; 정정 안내 (2026-07-18)</h3>
+        <p>
+          이전 버전은 이 지표를 <strong>DW-NOMINATE</strong>로 표기했으나 정확하지 않았다.
+          실제로는 위에 설명한 대수별 W-NOMINATE + bridging 정렬이다. 표기를 정정하고
+          정렬 절차를 문서화했으며, 생성 스크립트(<code>build_ideal_points.R</code>)를
+          공개했다. 상세는
+          <a href="https://github.com/kyusik-yang/kna/blob/main/CORRECTIONS.md" target="_blank" rel="noopener">CORRECTIONS.md</a>를 참조.
+        </p>
+        <p>
+          <strong>대수 간 비교 시 주의.</strong> 대수별로 따로 추정한 원점수를 그대로
+          비교하면 각 대수가 재정규화되기 때문에 양극화 증가폭이 과대평가된다. 20대와 22대
+          사이 양대 정당 간 거리는 원점수로는 65% 증가하지만, 이 사이트가 쓰는 bridging
+          정렬로는 6%, 통합 DW-NOMINATE로는 12% 증가한다. 저장소는 세 계열을 모두 제공한다.
+        </p>
+      </div>
 
       <h3>Data Sources</h3>
       <p>

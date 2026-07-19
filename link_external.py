@@ -112,12 +112,12 @@ def build_id_mapping():
 
     sources = {}
 
-    # Source 1: DW-NOMINATE (member_id = MONA_CD)
-    dw = pd.read_csv(PROCESSED / "dw_ideal_points_20_22.csv")
+    # Source 1: ideal points (member_id = MONA_CD)
+    dw = pd.read_csv(PROCESSED / "ideal_points_bridged.csv")
     dw_ids = dw[["member_id", "member_name", "party", "term"]].drop_duplicates()
     dw_ids = dw_ids.rename(columns={"member_id": "mona_cd"})
-    sources["dw_nominate"] = dw_ids
-    print(f"  DW-NOMINATE: {dw_ids['mona_cd'].nunique()} unique legislators")
+    sources["ideal_points"] = dw_ids
+    print(f"  Ideal points: {dw_ids['mona_cd'].nunique()} unique legislators")
 
     # Source 2: Roll calls (member_id)
     rc = pd.read_parquet(PROCESSED / "roll_calls_all.parquet",

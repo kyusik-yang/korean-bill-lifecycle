@@ -27,3 +27,7 @@ NOMINATE_METHODOLOGY.md
 PAPER_PLAN.md
 BIBLIOGRAPHY_VERIFIED.md
 paper/
+
+# Build artifacts
+dist/
+Rplots.pdf

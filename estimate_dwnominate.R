@@ -1,3 +1,25 @@
+# ============================================================
+# DEPRECATED (2026-07-18). Do not use.
+#
+# This script is superseded by build_ideal_points.R, which produces all three
+# ideal point series distributed by this repository.
+#
+# It is kept only for the record. The file it was believed to have produced,
+# data/processed/dw_ideal_points_20_22.csv, does not in fact match this
+# script's output: that file contained per-assembly W-NOMINATE estimates with
+# a post hoc sign alignment. The dwnominate package is not on CRAN and was not
+# installed in the environment that generated the release, so this script
+# almost certainly never ran to completion.
+#
+# Two things build_ideal_points.R does that this script does not, and without
+# which dwnominate() will fail on these data:
+#   - supplies starting values via the `start` argument (dwnominate cannot
+#     build common-space starts with fewer than five sessions)
+#   - attaches legis.data with ID and party columns and passes id = "ID"
+#
+# See CORRECTIONS.md.
+# ============================================================
+
 # estimate_dwnominate.R
 # ============================================================
 # DW-NOMINATE estimation for 20-22대 Korean National Assembly

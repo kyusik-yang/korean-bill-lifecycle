@@ -222,12 +222,12 @@ def get_legislator_profile(
 
         if len(ip_match) > 0:
             row = ip_match.iloc[0]
-            ip = row["aligned"]
+            ip = row["ideal_point"]
             party = row.get("party", "")
             # Rank within term
             term = row["term"]
             term_df = ip_df[ip_df["term"] == term].copy()
-            term_df["rank"] = term_df["aligned"].rank(ascending=True).astype(int)
+            term_df["rank"] = term_df["ideal_point"].rank(ascending=True).astype(int)
             my_rank = term_df[term_df["member_id"] == row["member_id"]]
             if len(my_rank) > 0:
                 rank = int(my_rank.iloc[0]["rank"])

@@ -94,7 +94,7 @@ def print_info(file_info: list[dict], rc_count: int, ip_count: int,
     console.print(t)
     console.print()
     console.print(f"  Roll call votes   {rc_count:>10,}  {dim('(16-22nd, bulk: 20-22nd)')}")
-    console.print(f"  Ideal points      {ip_count:>10,}  {dim('(20-22nd, DW-NOMINATE)')}")
+    console.print(f"  Ideal points      {ip_count:>10,}  {dim('(20-22nd, bridged W-NOMINATE)')}")
     console.print(f"  Members           {mem_count:>10,}  {dim('(17-22nd, party/district/committee)')}")
     console.print(f"  Asset disclosures {asset_count:>10,}  {dim('(19-22nd, member-year wealth)')}")
     console.print(f"  Committee mtgs    {cm_count:>10,}  {dim('(17-22nd)')}")
@@ -255,7 +255,7 @@ def print_legislator(
     if election_type:
         console.print(f"  {dim('election'):<20} {election_type}" + (f" ({reelection})" if reelection else ""))
     if ideal_point is not None:
-        console.print(f"  {dim('ideal point'):<20} {ideal_point:.3f} (DW-NOMINATE)")
+        console.print(f"  {dim('ideal point'):<20} {ideal_point:.3f} (bridged W-NOMINATE)")
     if rank is not None and total_in_term is not None:
         console.print(f"  {dim('rank'):<20} {rank} / {total_in_term} (← 진보 ··· 보수 →)")
 
