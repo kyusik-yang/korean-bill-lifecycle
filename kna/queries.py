@@ -33,7 +33,9 @@ def db_info(db: BillDB) -> dict:
     rc_count = len(pd.read_parquet(rc_path, columns=["term"])) if rc_path.exists() else 0
 
     # Ideal point count
-    ip_path = db.data_dir / "dw_ideal_points_20_22.csv"
+    # Default series is the bridged alignment (see CODEBOOK.md "Ideal Points");
+    # dw_ideal_points_20_22.csv is deprecated and must not be read.
+    ip_path = db.data_dir / "ideal_points_bridged.csv"
     ip_count = len(pd.read_csv(ip_path, usecols=["member_id"])) if ip_path.exists() else 0
 
     # Committee meeting count

@@ -207,8 +207,16 @@ master_bills (1 row = 1 bill, 49-55 columns)
 roll_calls_all (2.4M rows, member-level)
 └── term, member_name, member_id, party, vote, bill_id, date
 
-dw_ideal_points_20_22 (936 rows)
-└── member_id, member_name, term, party, aligned, party_bloc
+ideal_points_bridged (936 rows, default series; cross-assembly comparable)
+└── member_id, member_name, party, party_bloc, term, wnom_1d, bridged_1d
+
+ideal_points_wnominate (936 rows; within-assembly only)
+└── member_id, member_name, party, party_bloc, term, wnom_1d, wnom2d_dim1, wnom2d_dim2
+
+ideal_points_dwnominate (936 rows; pooled DW-NOMINATE, one value per member)
+└── member_id, member_name, party, party_bloc, term, dwnom_1d
+
+dw_ideal_points_20_22 (deprecated, see CORRECTIONS.md; removed next release)
 
 members_{age} (1,933 member-terms across 17-22nd)
 └── mona_cd, member_name, party, district, committee, sex, birth_date, election_type, reelection
